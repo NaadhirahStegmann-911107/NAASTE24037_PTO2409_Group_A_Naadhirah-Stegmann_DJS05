@@ -11,3 +11,30 @@ const tallyReducer = (state = { count: 0}, action) => {
             return state; // Returns unchanged state for unknown actions.
     }
 };
+// Create Store: A higher-order function that encapsulates the state and provides controlled access
+const createStore = (reducer) => {
+    // Initialize state using the reducer with undefined state and an empty action
+    let state = reducer(undefined, {});
+    // Immutable array of subscribers (callbacks to be called on state changes)
+    let subscribers = [];
+
+    // getState: Returns a copy of the current state to prevent external mutation
+    const getState = () => ({...state});
+
+    //dispatch: Updates state using the reducer and notifies subscribers
+    const dispatch = (action) => {
+        state = reducer(state, action); // Update state immutably via reducer
+        subscribers.forEach((callback) => callback(getState())); // Notify subscribers with new state
+    };
+
+    // subscribe: Adds a callback to the subscribers list, returns an unsubscribe function
+    const subscribe = (callback) => {
+        subscribers = [...subscribers, callback]; // Immutably add subscriber
+        // Return unubscribe function that removes the callback
+        return () => {
+            subscribers = subscribers.filters((cb) => cb !== callback); // Immutably remove subscriber
+        };
+    };
+    //Return public API of the store
+    return { getState, dispatch, subscribe };
+};
