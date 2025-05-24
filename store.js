@@ -30,7 +30,7 @@ const createStore = (reducer) => {
     // subscribe: Adds a callback to the subscribers list, returns an unsubscribe function
     const subscribe = (callback) => {
         subscribers = [...subscribers, callback]; // Immutably add subscriber
-        // Return unubscribe function that removes the callback
+        // Return unsubscribe function that removes the callback
         return () => {
             subscribers = subscribers.filters((cb) => cb !== callback); // Immutably remove subscriber
         };
@@ -38,3 +38,24 @@ const createStore = (reducer) => {
     //Return public API of the store
     return { getState, dispatch, subscribe };
 };
+
+// Create the store instance with the tally Reducer
+const store = createStore(tallyReducer);
+
+// Subscribe a logger function to log stat changes to the console
+const logState = (state) => console.log('Current State:', state);
+store.subscribe(logState);
+
+// Test the Scenarios from user stories
+console.log('Scenario 1: Initial State');
+console.log(store.getState()); // Expected: { count: 0 }
+
+console.log('Scenario 2: Incrementing the Counter');
+store.dispatch({ type: 'ADD'}); // Expected: { count: 1 }
+store.dispatch({ type: 'ADD'}); // Expected: { count: 2}
+
+console.log('Scenario 3: Decrementing the Counter');
+store.dispatch({ type: 'SUBTRACT'}); // Expected: { count: 1 }}
+
+console.log('Scenario 4: Resetting the Counter');
+store.dispatch({ type: 'RESET'}); // Expected: { count: 0 }
